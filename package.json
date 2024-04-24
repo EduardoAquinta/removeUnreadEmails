@@ -2,7 +2,7 @@
   "name": "removeunreademails",
   "version": "1.0.0",
   "description": "remove unread gmails",
-  "main": "remove-unread-gmails.js",
+  "main": "auth.js",
   "scripts": {
     "test": "jest"
   },
