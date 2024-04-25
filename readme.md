@@ -4,11 +4,11 @@ This might sound harsh but I have a gmail account with almost 2000 unread emails
 
 ## Installation 
 
-Clone this repo to your local computer, open it in the IDE of yoru choice and run:
+Clone this repo to your local computer, open it in the IDE of your choice and run:
 ```bash
 npm install
 ```
 
 ## Google OAuth2
 
-You will need to add your Google credentials and api-key to `credentials.json` and `token.json` respectively, in the main folder. 
+You will need to add your Google credentials and api-key to `credentials.json`, in the main folder. 
