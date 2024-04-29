@@ -1,8 +1,12 @@
 const authorize = require("./auth");
 const {google} = require("googleapis");
-
+const readline = require("./readline");
 let messageIdList;
 let messageCount = 0;
+
+function delay(t) {
+    return new Promise(resolve => setTimeout(resolve, t));
+}
 
 async function removeGmailMessages(auth, pageToken) {
     const gmail = google.gmail({version: 'v1', auth});
@@ -12,38 +16,37 @@ async function removeGmailMessages(auth, pageToken) {
             maxResults: 500,
             pageToken: pageToken,
         });
-        displayUnreadMessageList(response);
+        // displayUnreadMessageList(response);
         const messages = response.data.messages;
         const nextPageToken = response.data.nextPageToken;
         messageIdList = messages;
-        displayMessageSubject(messageIdList, gmail);
         console.log("Amount of displayed messages: ", messageCount);
     if(nextPageToken) {
         await removeGmailMessages(auth, nextPageToken);
     }
-    userDeletePrompt(gmail);
+    displayMessageSubject(messageIdList, gmail);
 }
 
-function displayUnreadMessageList(response) {
-    const messages = response.data.messages;
-    let nextPageToken = response.data.nextPageToken;
-    if (messages.length) {
-        console.log(`You have ${messages.length} unread messages`)
-        console.log("Next page token - ", nextPageToken)
-        console.log('Unread Messages:');
-        messages.forEach((message) => {
-            console.log('Message details - %s', message);
-        });
-    } else {
-        console.log('No unread messages found.');
-    }
-}
+// function displayUnreadMessageList(response) {
+//     const messages = response.data.messages;
+//     let nextPageToken = response.data.nextPageToken;
+//     if (messages.length) {
+//         console.log(`You have ${messages.length} unread messages`)
+//         console.log("Next page token - ", nextPageToken)
+//         console.log('Unread Messages:');
+//         messages.forEach((message) => {
+//             console.log('Message details - %s', message);
+//         });
+//     } else {
+//         console.log('No unread messages found.');
+//     }
+// }
 
 function displayMessageSubject(messages, gmail){
     if (messages.length) {
-        console.log('Unread Emails:');
-        messages.forEach((message) => {
-            let date = ""
+        console.log('First 10 unread emails:');
+        let first10Messages = messages.slice(0, 10);
+        first10Messages.forEach((message) => {
             gmail.users.messages.get({
                 userId: 'me',
                 id: message.id,
@@ -52,7 +55,6 @@ function displayMessageSubject(messages, gmail){
                 const subject = response.data.payload.headers.find(header => header.name === 'Subject').value;
                 console.log("Subject: ",subject);
             });
-            messageCount+=1;
         });
 
     } else {
@@ -61,7 +63,10 @@ function displayMessageSubject(messages, gmail){
 }
 
 function userDeletePrompt(gmail) {
-    let userInput = prompt("Would you like to remove messages?");
+    readline.question('What is your name?', name => {
+        console.log(`Hello, ${name}!`);
+        readline.close();
+    });
     let lowerCaseUserInput = userInput.toLowerCase();
     if(lowerCaseUserInput === "y" || lowerCaseUserInput === "yes"){
         let areYouSure = prompt("Are you sure?");
@@ -97,7 +102,8 @@ function deleteMessages(messageIdList, gmail){
 
 const runProgram = () =>{
     authorize().then(removeGmailMessages).catch(console.error);
-    console.log("Amount of displayed messages: ", messageCount);
+    authorize().then(userDeletePrompt).catch(console.error);
 }
 
 runProgram();
+console.log("Amount of displayed messages: ", messageCount);

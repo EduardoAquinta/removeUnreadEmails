@@ -70,6 +70,5 @@ async function authorize() {
  *
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-let pageToken;
 
 module.exports = authorize;
